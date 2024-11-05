@@ -108,7 +108,7 @@ def generate_report_button():
                         df_name = df[df['Nome'] == name]
                     else:
                         df_name = df[df['Name'] == name]
-                    report_file_path = save_location.replace('.xlsx', f'_{name}_report.xlsx')
+                    report_file_path = save_location.replace('.xlsx', f'_{name}.xlsx')
                     generate_report(df_name, report_file_path)
                 messagebox.showinfo("Sucesso", "Relatórios gerados para cada colaborador.")
             else:

@@ -18,7 +18,7 @@ split_by_name = False  # Variable for splitting reports by name
 target_minutes = 510  # Default target work time in minutes
 minutes_limit = 15  # Default tolerance limit in minutes
 save_location = ""  # Store the selected file location
-source_lang = "en"
+source_lang = "pt"
 
 
 def set_report_type(selected_type):

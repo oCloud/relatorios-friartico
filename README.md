@@ -1,10 +1,11 @@
 # relatorios-friartico
-
-
- pyinstaller --onefile --noconsole main.py --name FriarticoPonto
  
 
 ```commandline
-pyinstaller --onefile --noconsole --icon=icon.ico main.py --name RelatoriosFriartico
 
+pip install -r .\requirements.txt  
+ 
+. venv\Scripts\activate 
+
+pyinstaller --onefile --noconsole --icon=icon.ico main.py --name FriarticoPonto
 ```

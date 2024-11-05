@@ -18,6 +18,7 @@ split_by_name = False  # Variable for splitting reports by name
 target_minutes = 510  # Default target work time in minutes
 minutes_limit = 15  # Default tolerance limit in minutes
 save_location = ""  # Store the selected file location
+source_lang = "en"
 
 
 def set_report_type(selected_type):
@@ -94,13 +95,19 @@ def generate_report_button():
     if selected_file_path and save_location:
         try:
             # Read the selected CSV file
-            df = pd.read_csv(selected_file_path)
+            df = pd.read_csv(selected_file_path, encoding='ISO-8859-1')
 
             # Generate the report based on the user's settings
             if split_by_name:
-                unique_names = df['Name'].unique()
+                if source_lang == "pt":
+                    unique_names = df['Nome'].unique()
+                else:
+                    unique_names = df['Name'].unique()
                 for name in unique_names:
-                    df_name = df[df['Name'] == name]
+                    if source_lang == "pt":
+                        df_name = df[df['Nome'] == name]
+                    else:
+                        df_name = df[df['Name'] == name]
                     report_file_path = save_location.replace('.xlsx', f'_{name}_report.xlsx')
                     generate_report(df_name, report_file_path)
                 messagebox.showinfo("Sucesso", "Relatórios gerados para cada colaborador.")
@@ -131,8 +138,12 @@ def generate_report(df, output_file):
     """
     global report_type, target_minutes, minutes_limit
 
-    df['Time'] = pd.to_datetime(df['Time'], errors='coerce')
-    df['Date'] = df['Time'].dt.date
+    if source_lang == "pt":
+        df['Hora'] = pd.to_datetime(df['Hora'], errors='coerce')
+        df['Data'] = df['Hora'].dt.date
+    else:
+        df['Time'] = pd.to_datetime(df['Time'], errors='coerce')
+        df['Date'] = df['Time'].dt.date
 
     simplified_columns = ['Data', 'Nome', 'Entrada', 'Saída Almoço', 'Entrada Almoço', 'Saída']
     full_columns = ['Data', 'Nome', 'Entrada', 'Saída Alm.', 'Entrada Alm.', 'Saída', 'Trabalho (min)', 'Extra/Falta']
@@ -143,14 +154,24 @@ def generate_report(df, output_file):
     lower_limit = target_minutes - minutes_limit
     upper_limit = target_minutes + minutes_limit
 
-    grouped = df.groupby(['Person ID', 'Name', 'Date'])
+    if source_lang == "pt":
+        grouped = df.groupby(['ID da pessoa', 'Nome', 'Data'])
+    else:
+        grouped = df.groupby(['Person ID', 'Name', 'Date'])
 
     for (person_id, name, date), group in grouped:
-        check_in = group.loc[group['Attendance Status'] == 'Check in', 'Time'].min()
-        check_out = group.loc[group['Attendance Status'] == 'Check out', 'Time'].max()
+        if source_lang == "pt":
+            check_in = group.loc[group['Status de presença'] == 'Check in', 'Hora'].min()
+            check_out = group.loc[group['Status de presença'] == 'Check out', 'Hora'].max()
 
-        lunch_out = group.loc[group['Attendance Status'] == 'Coffee out', 'Time'].min() if 'Coffee out' in group['Attendance Status'].values else None
-        lunch_in = group.loc[group['Attendance Status'] == 'Coffee in', 'Time'].max() if 'Coffee in' in group['Attendance Status'].values else None
+            lunch_out = group.loc[group['Status de presença'] == 'Coffee out', 'Hora'].min() if 'Coffee out' in group['Status de presença'].values else None
+            lunch_in = group.loc[group['Status de presença'] == 'Coffee in', 'Hora'].max() if 'Coffee in' in group['Status de presença'].values else None
+        else:
+            check_in = group.loc[group['Attendance Status'] == 'Check in', 'Time'].min()
+            check_out = group.loc[group['Attendance Status'] == 'Check out', 'Time'].max()
+
+            lunch_out = group.loc[group['Attendance Status'] == 'Coffee out', 'Time'].min() if 'Coffee out' in group['Attendance Status'].values else None
+            lunch_in = group.loc[group['Attendance Status'] == 'Coffee in', 'Time'].max() if 'Coffee in' in group['Attendance Status'].values else None
 
         if pd.notnull(check_in) and pd.notnull(check_out):
             total_work_time = (check_out - check_in).total_seconds() / 60

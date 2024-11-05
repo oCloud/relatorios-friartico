@@ -15,4 +15,4 @@ Source: "dist\FriarticoPonto.exe"; DestDir: "{app}"; Flags: ignoreversion
 Name: "{group}\FriarticoPonto"; Filename: "{app}\FriarticoPonto.exe"
 
 [Run]
-Filename: "{app}\FriarticoPonto.exe"; Description: "Launch YourAppName"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\FriarticoPonto.exe"; Description: "Relatorios de Ponto Friartico"; Flags: nowait postinstall skipifsilent
